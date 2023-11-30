@@ -79,6 +79,7 @@ ENV DEBUG=${DEBUG:-""}
 # hadolint ignore=DL3013
 RUN if [ "$DEBUG" ]; then FLAGS="-e"; fi && \
     pip install --user ${FLAGS} ".[all]" && pip check
+RUN patch -d/ -p0 < records_rest.patch
 # Create instance
 RUN scripts/create-instance.sh
 

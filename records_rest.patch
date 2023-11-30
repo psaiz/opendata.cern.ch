@@ -1,0 +1,75 @@
+--- /opt/invenio/var/instance/python/lib/python3.9/site-packages/invenio_records_rest/facets.py		2023-11-29 17:33:31
++++ /opt/invenio/var/instance/python/lib/python3.9/site-packages/invenio_records_rest/facets.py.new	2023-11-29 17:33:20
+@@ -138,11 +138,37 @@
+ 
+     return (search, urlkwargs)
+ 
++def without_nested_subtypes(facet_filters, facet_names):
++    """Remove the nested subtypes from the filter.
+ 
+-def _aggregations(search, definitions):
++    Example: If `CMS` from Experiment type is selected
++    then aggregation count of other subtypes in Experiment
++    type will not be changed.
++    """
++    new_facet_filters = facet_filters.copy()
++    for name in facet_names:
++        new_facet_filters.pop(name)
++    return new_facet_filters
++
++def _aggregations(search, definitions, updated_filters=None, urlkwargs=None):
+     """Add aggregations to query."""
+     if definitions:
+         for name, agg in definitions.items():
++            if name in updated_filters:
++                (facet_filters, _)= _create_filter_dsl(urlkwargs, without_nested_subtypes(updated_filters, [name]))
++                agg = {
++                    "filter":
++                        {
++                            "bool":
++                                {
++                                    "must": [
++                                        facet_filter.to_dict()
++                                        for facet_filter in facet_filters
++                                    ]
++                                }
++                        },
++                    "aggs": {"filtered": agg},
++                }
+             search.aggs[name] = agg if not callable(agg) else agg()
+     return search
+ 
+@@ -167,18 +193,22 @@
+         # if they were provided as list separated by comma.
+         selected_facets = make_comma_list_a_list(request.args.getlist("facets", None))
+         all_aggs = facets.get("aggs", {})
+-
++        if current_app.config["RECORDS_REST_FACETS_FILTER"]:
++            updated_filters = facets.get("post_filters", {})
++        else:
++            updated_filters = {}
+         # If no facets were requested, assume default behaviour - Take all.
+-        if not selected_facets:
+-            search = _aggregations(search, all_aggs)
+-        # otherwise, check if there are facets to chose
+-        elif selected_facets and all_aggs:
+-            aggs = {}
+-            # Go through all available facets and check if they were requested.
+-            for facet_name, facet_body in all_aggs.items():
+-                if facet_name in selected_facets:
+-                    aggs.update({facet_name: facet_body})
+-            search = _aggregations(search, aggs)
++        if all_aggs:
++            if not selected_facets:
++                search = _aggregations(search, all_aggs, updated_filters, urlkwargs)
++            # otherwise, check if there are facets to chose
++            else:
++                aggs = {}
++                # Go through all available facets and check if they were requested.
++                for facet_name, facet_body in all_aggs.items():
++                    if facet_name in selected_facets:
++                        aggs.update({facet_name: facet_body})
++                search = _aggregations(search, aggs, updated_filters, urlkwargs)
+ 
+         # Query filter
+         search, urlkwargs = _query_filter(search, urlkwargs, facets.get("filters", {}))
