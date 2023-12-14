@@ -102,7 +102,7 @@ SESSION_COOKIE_SAMESITE = "Lax"
 # ======
 #: Default application theme.
 APP_THEME = ["semantic-ui"]
-ACCOUNTS_REGISTER_BLUEPRINT = False
+#ACCOUNTS_REGISTER_BLUEPRINT = False
 
 # Static file
 COLLECT_STORAGE = (
