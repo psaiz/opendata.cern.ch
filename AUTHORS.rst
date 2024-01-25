@@ -37,6 +37,7 @@ The list of contributors in alphabetical order:
 - `Matt Bellis <https://github.com/mattbellis>`_
 - `Mihaela Gheata <https://github.com/mgheata>`_
 - `Osama Sh. Almomani <https://github.com/OsamaMomani>`_
+- `Pablo Saiz <https://github.com/psaiz>`_
 - `Pamfilos Fokianos <https://github.com/pamfilos>`_
 - `Patricia Herterich <https://github.com/pherterich>`_
 - `Richard Hildebrandt <https://github.com/rdebrand>`_
@@ -48,3 +49,4 @@ The list of contributors in alphabetical order:
 - `Thomas McCauley <https://github.com/tpmccauley>`_
 - `Tibor Šimko <https://orcid.org/0000-0001-7202-5803>`_
 - `Tim Smith <https://github.com/TimSmithCH>`_
+- `Zacharias Zacharodimos <https://github.com/zzacharo>`_
